@@ -33,7 +33,7 @@ Fastly Compute compiles Go to WebAssembly using the WASI target (`GOOS=wasip1 GO
 ## 📦 2. Project Configuration
 
 ### `fastly.toml`
-The Fastly configuration file defines the service manifest and local backend mapping for `fastly compute serve`:
+The Fastly configuration file defines the service manifest, build script, and local backend mapping for `fastly compute serve`:
 
 ```toml
 manifest_version = 3
@@ -42,9 +42,15 @@ description = "Fastly Compute edge caching tutorial application in Go"
 authors = ["Fastly Workshop"]
 language = "go"
 
+[scripts]
+build = "GOOS=wasip1 GOARCH=wasm go build -o bin/main.wasm ."
+
 [local_server.backends.backend_api]
 url = "https://nominally-gentle-rodent.edgecompute.app"
 ```
+
+> [!TIP]
+> Setting `[scripts.build]` instructs the Fastly CLI to compile using standard Go (`go build`) targeting WebAssembly WASI instead of defaulting to TinyGo.
 
 ### `go.mod`
 The Go module depends on `github.com/fastly/compute-sdk-go`:
@@ -64,7 +70,7 @@ require github.com/fastly/compute-sdk-go v1.4.0
 When sending requests to an upstream backend using `fsthttp.NewRequest`, you can control edge caching behavior through `fsthttp.Request.CacheOptions`:
 
 ```go
-bereq.CacheOptions = &fsthttp.CacheOptions{
+bereq.CacheOptions = fsthttp.CacheOptions{
     Pass:                 false, // If true, bypasses the cache entirely
     TTL:                  900,   // Cache at the edge for 15 minutes (in seconds)
     StaleWhileRevalidate: 3600,  // Serve stale cached content for up to 1 hour while refreshing in background
@@ -114,7 +120,7 @@ func proxyToBackend(ctx context.Context, w fsthttp.ResponseWriter, r *fsthttp.Re
 	bereq.Header.Set("User-Agent", "fastly-compute-go-edge/1.0")
 
 	// Configure Edge Caching policy
-	bereq.CacheOptions = &fsthttp.CacheOptions{
+	bereq.CacheOptions = fsthttp.CacheOptions{
 		TTL:                  ttl,
 		StaleWhileRevalidate: swr,
 	}

@@ -177,7 +177,7 @@ You can override origin cache behavior directly in your edge code:
 
 - **Go SDK (`compute-sdk-go`)**:
   ```go
-  bereq.CacheOptions = &fsthttp.CacheOptions{
+  bereq.CacheOptions = fsthttp.CacheOptions{
       TTL:                  900,
       StaleWhileRevalidate: 3600,
   }

@@ -4,5 +4,8 @@ description = "Fastly Compute edge caching tutorial application in Go"
 authors = ["Fastly Workshop"]
 language = "go"
 
+[scripts]
+build = "GOOS=wasip1 GOARCH=wasm go build -o bin/main.wasm ."
+
 [local_server.backends.backend_api]
 url = "https://nominally-gentle-rodent.edgecompute.app"
