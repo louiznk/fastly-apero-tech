@@ -29,7 +29,7 @@ func proxyToBackend(ctx context.Context, w fsthttp.ResponseWriter, r *fsthttp.Re
 	bereq.Header.Set("User-Agent", "fastly-compute-go-edge/1.0")
 
 	// Apply Fastly Edge Cache Options (TTL & Stale-While-Revalidate)
-	bereq.CacheOptions = &fsthttp.CacheOptions{
+	bereq.CacheOptions = fsthttp.CacheOptions{
 		TTL:                  ttl,
 		StaleWhileRevalidate: swr,
 	}
