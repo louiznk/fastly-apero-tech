@@ -1,10 +1,30 @@
 use fastly::http::{header, Method, StatusCode};
-use fastly::{mime, Error, Request, Response};
+use fastly::{Error, Request, Response};
+
+const BACKEND_NAME: &str = "backend_api";
+const BACKEND_HOST: &str = "nominally-gentle-rodent.edgecompute.app";
+
+fn proxy_to_backend(req: &Request, ttl_secs: u32, swr_secs: u32) -> Result<Response, Error> {
+    let path = req.get_path();
+    let query = req.get_query_str();
+
+    let url = match query {
+        Some(q) if !q.is_empty() => format!("https://{BACKEND_HOST}{path}?{q}"),
+        _ => format!("https://{BACKEND_HOST}{path}"),
+    };
+
+    let bereq = Request::get(url)
+        .with_header(header::HOST, BACKEND_HOST)
+        .with_header(header::USER_AGENT, "fastly-compute-rust-edge/1.0")
+        .with_ttl(ttl_secs)
+        .with_stale_while_revalidate(swr_secs);
+
+    let beresp = bereq.send(BACKEND_NAME)?;
+    Ok(beresp)
+}
 
 #[fastly::main]
 fn main(req: Request) -> Result<Response, Error> {
-    // Starter template: Hello from Fastly Compute Rust!
-    // Follow the tutorial in rust/README.md to connect the backend API and configure edge caching.
     match req.get_method() {
         &Method::GET | &Method::HEAD => (),
         _ => {
@@ -15,18 +35,10 @@ fn main(req: Request) -> Result<Response, Error> {
     }
 
     match req.get_path() {
-        "/" => Ok(Response::from_status(StatusCode::OK)
-            .with_header(header::CONTENT_TYPE, mime::TEXT_HTML_UTF_8.as_ref())
-            .with_body(
-                r#"<!DOCTYPE html>
-<html>
-<head><title>Fastly Compute Rust Starter</title></head>
-<body>
-<h1>Fastly Compute Rust Starter</h1>
-<p>Service is running! Follow the tutorial in <code>rust/README.md</code> to connect the backend API.</p>
-</body>
-</html>"#,
-            )),
+        "/" => proxy_to_backend(&req, 3600, 7200),
+        "/current" => proxy_to_backend(&req, 900, 3600),
+        "/next" => proxy_to_backend(&req, 900, 3600),
+        "/city" => proxy_to_backend(&req, 60, 300),
         _ => Ok(Response::from_status(StatusCode::NOT_FOUND)
             .with_body_text_plain("The page you requested could not be found\n")),
     }
