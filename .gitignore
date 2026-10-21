@@ -1,0 +1,8 @@
+target/
+bin/
+pkg/
+node_modules/
+.idea/
+.DS_Store
+*.wasm
+*.tar.gz

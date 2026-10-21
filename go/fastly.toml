@@ -1,0 +1,8 @@
+manifest_version = 3
+name = "fastly-apero-go"
+description = "Fastly Compute edge caching tutorial application in Go"
+authors = ["Fastly Workshop"]
+language = "go"
+
+[local_server.backends.backend_api]
+url = "https://nominally-gentle-rodent.edgecompute.app"

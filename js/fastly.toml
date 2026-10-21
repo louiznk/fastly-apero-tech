@@ -1,0 +1,8 @@
+manifest_version = 3
+name = "fastly-apero-js"
+description = "Fastly Compute edge caching tutorial application in JavaScript"
+authors = ["Fastly Workshop"]
+language = "javascript"
+
+[local_server.backends.backend_api]
+url = "https://nominally-gentle-rodent.edgecompute.app"

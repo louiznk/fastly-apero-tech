@@ -1,0 +1,8 @@
+manifest_version = 3
+name = "fastly-apero-rust"
+description = "Fastly Compute edge caching tutorial application in Rust"
+authors = ["Fastly Workshop"]
+language = "rust"
+
+[local_server.backends.backend_api]
+url = "https://nominally-gentle-rodent.edgecompute.app"
