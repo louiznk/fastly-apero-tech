@@ -112,11 +112,26 @@ fastly-apero-tech/
 
 ### Step 2: Choose Your Language & Setup Toolchain
 
-Navigate to your language of choice:
+#### The easy way: Navigate to your language of choice:
 
 - 👉 [Go Tutorial & Guide](./go/README.md) (requires Go 1.21+)
 - 👉 [JavaScript Tutorial & Guide](./js/README.md) (requires Node.js 18+)
 - 👉 [Rust Tutorial & Guide](./rust/README.md) (requires `rustup target add wasm32-wasip1`)
+
+### A less easy way: init the project with the Fastly Compute CLI
+
+Create a new directory for your project and then
+
+```bash
+fastly compute init
+```
+
+1. Enter your service name and description when prompted.
+2. Select your preferred language: **Rust**, **Go**, or **JavaScript**.
+3. Choose the **Default** starter kit.
+
+And can still use the specific README.md by language
+
 
 ---
 
@@ -168,10 +183,12 @@ When you forward a request to an upstream origin, Fastly automatically respects 
 - `Surrogate-Control: max-age=1800`
 
 #### 2. Programmatic Cache Overrides (Fastly SDK)
-You can override origin cache behavior directly in your edge code:
+You **can override** origin cache behavior directly in your edge code:
 - **Time-to-Live (TTL)**: How long Fastly caches the response at the edge.
 - **Stale-While-Revalidate (SWR)**: How long Fastly serves a stale cached copy while asynchronously refreshing from the backend in the background.
 - **Surrogate Keys**: Tagging cache entries for instant, targeted purging.
+
+**note**: I don't recommend overriding the cache header parameters: it's not the behavior provided by the emitter.
 
 #### Language-Specific Cache Overrides:
 
@@ -181,6 +198,8 @@ You can override origin cache behavior directly in your edge code:
       TTL:                  900,
       StaleWhileRevalidate: 3600,
   }
+  resp, err := bereq.Send(ctx, "backend_api")
+  
   ```
 
 - **JavaScript SDK (`@fastly/js-compute`)**:
@@ -203,6 +222,11 @@ You can override origin cache behavior directly in your edge code:
   let beresp = bereq.send("backend_api")?;
   ```
 
+The fastly readthrough cache(the basic http cache) deal with a lot things.
+If you want to add some special case with this cache like using a caching response on 50x response, 
+you can use in the CacheOption the [AfterSend](https://www.fastly.com/documentation/guides/concepts/cache/#controlling-cache-behavior-based-on-backend-response) to change the behavior.
+
+
 ---
 
 ### Step 6: Deploying to Fastly
@@ -223,6 +247,33 @@ During the initial deployment:
    - Use TLS: `yes`
 
 Upon deployment, Fastly will display your live edge URL (e.g. `https://your-service-xyz.edgecompute.app`).
+
+---
+
+## ⚙️ Other useful commands
+
+👉 [Fastly CLI documentation](https://www.fastly.com/documentation/reference/cli/)
+
+
+For **create**, update, delete, list, ... the backend (of a service)
+```bash
+fastly service backend ...
+```
+
+For **create**, update, delete, describe, list, **purge** ... a service (a compute is a type of service)
+```bash
+fastly service ...
+```
+
+For **create**, delete, describe list the kv store
+```bash
+fastly kv-store ...
+```
+
+For **create**, update, delete, describe, list the link between a service and resource like a storage (kv store, config store, ...)
+```bash
+fastly service resource-link  ...
+```
 
 ---
 
