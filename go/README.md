@@ -89,7 +89,7 @@ bereq.CacheOptions = fsthttp.CacheOptions{
 ## 👨‍💻 4. Step-by-Step Implementation
 
 ### Step 1: Define Backend Constants
-In `main.go`, specify the backend configuration:
+In `cmd/fastly/main.go`, specify the backend configuration:
 
 ```go
 const (
@@ -206,5 +206,5 @@ To view the complete working Go solution:
 
 ```bash
 git checkout solution-backend
-cat go/main.go
+cat go/cmd/fastly/main.go
 ```
