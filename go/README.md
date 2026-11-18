@@ -43,7 +43,7 @@ authors = ["Fastly Workshop"]
 language = "go"
 
 [scripts]
-build = "GOOS=wasip1 GOARCH=wasm go build -o bin/main.wasm ."
+build = "GOOS=wasip1 GOARCH=wasm go build -o bin/main.wasm ./cmd/fastly/main.go"
 
 [local_server.backends.backend_api]
 url = "https://nominally-gentle-rodent.edgecompute.app"
@@ -62,6 +62,16 @@ go 1.21
 
 require github.com/fastly/compute-sdk-go v1.4.0
 ```
+
+### DDD Architecture
+
+The application is split into runtime-agnostic business logic and runtime-specific adapters:
+
+- `internal/application/` — ports (interfaces) and business logic (`Handle`, `ProxyToBackend`). It never imports `fsthttp` or `net/http`.
+- `internal/fastlyadapter/` — adapts the Fastly Compute SDK (`fsthttp`) to the application ports.
+- `cmd/fastly/main.go` — composition root for Fastly Compute; injects the Fastly adapter with `application.SetClient`.
+
+This separation allows adding another runtime (e.g. native `net/http`) without changing the business logic.
 
 ---
 
@@ -97,6 +107,8 @@ const (
 	backendHost = "nominally-gentle-rodent.edgecompute.app"
 )
 ```
+
+These constants live in `internal/application/backend.go`.
 
 ### Step 2: Implement Upstream Proxy Handler
 Create a helper function to proxy requests to `backend_api` with custom caching policies:
@@ -144,12 +156,16 @@ func proxyToBackend(ctx context.Context, w fsthttp.ResponseWriter, r *fsthttp.Re
 }
 ```
 
+This helper lives in `internal/application/backend.go`.
+
 ### Step 3: Handle Routing
 In your `fsthttp.ServeFunc` router:
 - `/`: Serve an HTML documentation/landing page or proxy `/` to upstream.
 - `/current`: Proxy with `TTL = 900` (15m) and `SWR = 3600` (1h).
 - `/next`: Proxy hourly forecast with `TTL = 900` and `SWR = 3600`.
 - `/city`: Proxy city lookup with `TTL = 60` (1m) and `SWR = 300` (5m).
+
+The routing logic lives in `internal/application/handler.go` and is invoked by the runtime-specific `main`.
 
 ---
 
