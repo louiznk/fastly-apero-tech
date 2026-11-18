@@ -69,9 +69,11 @@ The application is split into runtime-agnostic business logic and runtime-specif
 
 - `internal/application/` — ports (interfaces) and business logic (`Handle`, `ProxyToBackend`). It never imports `fsthttp` or `net/http`.
 - `internal/fastlyadapter/` — adapts the Fastly Compute SDK (`fsthttp`) to the application ports.
+- `internal/httpadapter/` — adapts the native Go `net/http` API to the application ports.
 - `cmd/fastly/main.go` — composition root for Fastly Compute; injects the Fastly adapter with `application.SetClient`.
+- `cmd/http/main.go` — composition root for native Go; injects the `net/http` adapter with `application.SetClient`.
 
-This separation allows adding another runtime (e.g. native `net/http`) without changing the business logic.
+This separation allows running the same business logic on Fastly Compute and on a native Go HTTP server.
 
 ---
 
@@ -191,6 +193,21 @@ curl -i "http://localhost:7676/next?country=FR&city=Paris"
 
 # 4. Test city metadata endpoint
 curl -i "http://localhost:7676/city?country=FR&city=Lyon"
+```
+
+### Running the native Go version (optional)
+
+The same business logic can run as a standard Go HTTP server:
+
+```bash
+go build -o bin/http ./cmd/http/main.go
+./bin/http
+```
+
+The server listens on `:8080`. You can test the same endpoints:
+
+```bash
+curl -i http://localhost:8080/current?country=FR&city=Lyon
 ```
 
 ---
