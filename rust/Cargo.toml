@@ -3,5 +3,9 @@ name = "fastly-apero-rust"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "fastly"
+path = "src/bin/fastly.rs"
+
 [dependencies]
 fastly = "~0.13.3"

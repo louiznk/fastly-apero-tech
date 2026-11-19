@@ -100,7 +100,7 @@ let beresp = bereq.send("backend_api")?;
 ## 👨‍💻 4. Step-by-Step Implementation
 
 ### Step 1: Define Backend Constants
-In `src/main.rs`:
+In `src/bin/fastly.rs`:
 
 ```rust
 const BACKEND_NAME: &str = "backend_api";
@@ -210,5 +210,5 @@ To view the complete working Rust solution:
 
 ```bash
 git checkout solution-backend
-cat rust/src/main.rs
+cat rust/src/bin/fastly.rs
 ```
