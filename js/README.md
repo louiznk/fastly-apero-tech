@@ -61,7 +61,7 @@ Specifies `@fastly/js-compute` and the build script:
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "js-compute-runtime ./src/index.js ./bin/main.wasm"
+    "build": "js-compute-runtime ./src/fastly.js ./bin/main.wasm"
   },
   "dependencies": {
     "@fastly/js-compute": "^3.16.0"
@@ -100,7 +100,7 @@ const beresp = await fetch(url, {
 ## 👨‍💻 4. Step-by-Step Implementation
 
 ### Step 1: Define Backend Constants
-In `src/index.js`:
+In `src/fastly.js`:
 
 ```javascript
 const BACKEND_NAME = "backend_api";
@@ -223,5 +223,5 @@ To view the complete working JavaScript solution:
 
 ```bash
 git checkout solution-backend
-cat js/src/index.js
+cat js/src/fastly.js
 ```
