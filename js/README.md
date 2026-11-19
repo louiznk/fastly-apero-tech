@@ -75,9 +75,11 @@ The application is split into runtime-agnostic business logic and runtime-specif
 
 - `src/application/` — ports and business logic (`handle`, `proxyToBackend`). It does not import the Fastly SDK.
 - `src/fastlyadapter.js` — adapts the Fastly Compute SDK to the application ports.
+- `src/httpadapter.js` — adapts Node's native HTTP client to the application ports.
 - `src/fastly.js` — composition root for Fastly Compute; injects the Fastly adapter with `setClient`.
+- `src/http.js` — composition root for native HTTP; injects the native adapter with `setClient`.
 
-This separation allows adding another runtime without changing the business logic.
+This separation allows running the same business logic on Fastly Compute and on a native Node HTTP server.
 
 ---
 
@@ -205,6 +207,20 @@ async function handleRequest(event) {
    # 4. Test city metadata endpoint
    curl -i "http://localhost:7676/city?country=FR&city=Lyon"
    ```
+
+### Running the native JavaScript version (optional)
+
+The same business logic can run as a standard Node HTTP server:
+
+```bash
+npm run start:http
+```
+
+The server listens on `:8080`. You can test the same endpoints:
+
+```bash
+curl -i http://localhost:8080/current?country=FR&city=Lyon
+```
 
 ---
 
