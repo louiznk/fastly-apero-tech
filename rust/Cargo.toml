@@ -3,9 +3,18 @@ name = "fastly-apero-rust"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "fastly_apero_rust"
+path = "src/lib.rs"
+
 [[bin]]
 name = "fastly"
 path = "src/bin/fastly.rs"
+required-features = ["fastly"]
+
+[features]
+default = []
+fastly = ["dep:fastly"]
 
 [dependencies]
 fastly = "~0.13.3"
