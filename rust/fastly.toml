@@ -4,5 +4,8 @@ description = "Fastly Compute edge caching tutorial application in Rust"
 authors = ["Fastly Workshop"]
 language = "rust"
 
+[scripts]
+build = "cargo build --release --target wasm32-wasip1 --bin fastly"
+
 [local_server.backends.backend_api]
 url = "https://nominally-gentle-rodent.edgecompute.app"
