@@ -61,9 +61,23 @@ name = "fastly-apero-rust"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = []
+fastly = ["dep:fastly"]
+
 [dependencies]
-fastly = "0.13"
+fastly = { version = "0.13", optional = true }
 ```
+
+### DDD Architecture
+
+The application is split into runtime-agnostic business logic and runtime-specific adapters:
+
+- `src/application/` — ports and business logic (`handle`, `proxy_to_backend`). It does not import the Fastly SDK.
+- `src/fastlyadapter.rs` — adapts the Fastly Compute SDK to the application ports.
+- `src/bin/fastly.rs` — composition root for Fastly Compute; injects the Fastly adapter with `application::set_client`.
+
+This separation allows adding another runtime without changing the business logic.
 
 ### `rust-toolchain.toml`
 Pin the WASI target:
@@ -100,7 +114,7 @@ let beresp = bereq.send("backend_api")?;
 ## 👨‍💻 4. Step-by-Step Implementation
 
 ### Step 1: Define Backend Constants
-In `src/bin/fastly.rs`:
+These constants live in `src/application/backend.rs`:
 
 ```rust
 const BACKEND_NAME: &str = "backend_api";
@@ -131,8 +145,10 @@ fn proxy_to_backend(req: &Request, ttl_secs: u32, swr_secs: u32) -> Result<Respo
 }
 ```
 
+This logic lives in `src/application/backend.rs`.
+
 ### Step 3: Handle Routing
-In your `main` entry point:
+The runtime-agnostic routing logic lives in `src/application/handler.rs`. `src/bin/fastly.rs` is the Fastly composition root:
 
 ```rust
 #[fastly::main]
