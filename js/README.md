@@ -69,6 +69,16 @@ Specifies `@fastly/js-compute` and the build script:
 }
 ```
 
+### DDD Architecture
+
+The application is split into runtime-agnostic business logic and runtime-specific adapters:
+
+- `src/application/` — ports and business logic (`handle`, `proxyToBackend`). It does not import the Fastly SDK.
+- `src/fastlyadapter.js` — adapts the Fastly Compute SDK to the application ports.
+- `src/fastly.js` — composition root for Fastly Compute; injects the Fastly adapter with `setClient`.
+
+This separation allows adding another runtime without changing the business logic.
+
 ---
 
 ## 💡 3. Fastly JS SDK Caching Mechanics: `CacheOverride`
@@ -100,7 +110,7 @@ const beresp = await fetch(url, {
 ## 👨‍💻 4. Step-by-Step Implementation
 
 ### Step 1: Define Backend Constants
-In `src/fastly.js`:
+These constants live in `src/application/backend.js`:
 
 ```javascript
 const BACKEND_NAME = "backend_api";
@@ -134,8 +144,10 @@ async function proxyToBackend(url, ttl = 900, swr = 3600) {
 }
 ```
 
+This logic lives in `src/application/backend.js`.
+
 ### Step 3: Handle Routing
-In your `handleRequest` function:
+The runtime-agnostic routing logic lives in `src/application/handler.js`; `src/fastly.js` is the Fastly composition root:
 
 ```javascript
 async function handleRequest(event) {
