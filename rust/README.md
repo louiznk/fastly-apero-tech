@@ -75,9 +75,11 @@ The application is split into runtime-agnostic business logic and runtime-specif
 
 - `src/application/` — ports and business logic (`handle`, `proxy_to_backend`). It does not import the Fastly SDK.
 - `src/fastlyadapter.rs` — adapts the Fastly Compute SDK to the application ports.
+- `src/httpadapter.rs` — adapts a native blocking HTTP client to the application ports.
 - `src/bin/fastly.rs` — composition root for Fastly Compute; injects the Fastly adapter with `application::set_client`.
+- `src/bin/http.rs` — composition root for native HTTP; injects the native adapter with `application::set_client`.
 
-This separation allows adding another runtime without changing the business logic.
+This separation allows running the same business logic on Fastly Compute and on a native HTTP server.
 
 ### `rust-toolchain.toml`
 Pin the WASI target:
@@ -196,6 +198,20 @@ fn main(req: Request) -> Result<Response, Error> {
    # 4. Test city metadata endpoint
    curl -i "http://localhost:7676/city?country=FR&city=Lyon"
    ```
+
+### Running the native Rust version (optional)
+
+The same business logic can run as a standard HTTP server:
+
+```bash
+cargo run --features native-http --bin http
+```
+
+The server listens on `:8080`. You can test the same endpoints:
+
+```bash
+curl -i http://localhost:8080/current?country=FR&city=Lyon
+```
 
 ---
 

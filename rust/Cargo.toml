@@ -12,9 +12,16 @@ name = "fastly"
 path = "src/bin/fastly.rs"
 required-features = ["fastly"]
 
+[[bin]]
+name = "http"
+path = "src/bin/http.rs"
+required-features = ["native-http"]
+
 [features]
 default = []
 fastly = ["dep:fastly"]
+native-http = ["dep:ureq"]
 
 [dependencies]
 fastly = { version = "0.13", optional = true }
+ureq = { version = "2", optional = true }
