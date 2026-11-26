@@ -8,6 +8,6 @@
     "build": "js-compute-runtime ./src/fastly.js ./bin/main.wasm"
   },
   "dependencies": {
-    "@fastly/js-compute": "^4.4fat.0"
+    "@fastly/js-compute": "^4.4.0"
   }
 }

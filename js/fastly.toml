@@ -4,5 +4,8 @@ description = "Fastly Compute edge caching tutorial application in JavaScript"
 authors = ["Fastly Workshop"]
 language = "javascript"
 
+[scripts]
+build = "npm exec js-compute-runtime ./src/fastly.js ./bin/main.wasm"
+
 [local_server.backends.backend_api]
 url = "https://nominally-gentle-rodent.edgecompute.app"
