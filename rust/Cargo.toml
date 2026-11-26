@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-fastly = "0.13"
+fastly = "~0.13.3"
