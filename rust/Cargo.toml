@@ -17,4 +17,4 @@ default = []
 fastly = ["dep:fastly"]
 
 [dependencies]
-fastly = "~0.13.3"
+fastly = { version = "0.13.3", optional = true }
